@@ -1,0 +1,16 @@
+name: franka_control
+channels:
+  - pytorch
+  - fair-robotics
+  - aihabitat
+  - conda-forge
+dependencies:
+  - polymetis
+  - opencv
+  - librealsense=2.50.0
+  - python=3.8
+  - pip
+  - tqdm
+  - pip:
+    - gym
+    - rospkg

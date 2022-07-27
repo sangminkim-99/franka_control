@@ -5,7 +5,6 @@ from util import robot_setup, Rate, LOW_JOINTS, HIGH_JOINTS
 from camera import Camera
 from collections import OrderedDict
 
-
 class FrankaEnv(Env):
     def __init__(self, home, hz, gain_type, camera=True):
         self.observation_space = spaces.Box(

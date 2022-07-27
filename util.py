@@ -4,13 +4,15 @@ import torchcontrol as toco
 from typing import Dict
 from polymetis import RobotInterface
 
-
-TIME = 10
 HZ = 30
 HOMES = {
     "pour": [0.1828, -0.4909, -0.0093, -2.4412, 0.2554, 3.3310, 0.5905],
     "scoop": [0.1828, -0.4909, -0.0093, -2.4412, 0.2554, 3.3310, 0.5905],
     "zip": [-0.1337, 0.3634, -0.1395, -2.3153, 0.1478, 2.7733, -1.1784],
+    "circle": [-0.1337, 0.3634, -0.1395, -2.3153, 0.1478, 2.7733, -1.1784], # isdf mapping of room
+    "scan": 
+    # [-2.5170, -0.4619, -0.1252, -2.0640, -0.0952,  1.7888, -0.8808], # isdf mapping of tabletop (need to adjust workspace limits in polymetis nuc)
+    [-0.2765, -0.6705,  0.1542, -2.5442,  0.1547,  2.2101, -1.0348], # front
     "insertion": [0.1828, -0.4909, -0.0093, -2.4412, 0.2554, 3.3310, 0.5905],
 }
 KQ_GAINS = {
@@ -73,8 +75,9 @@ class Rate:
 
 def robot_setup(home_pos, gain_type, franka_ip="172.16.0.1"):
     # Initialize robot interface and reset
-    robot = RobotInterface(ip_address=franka_ip)
+    robot = RobotInterface(ip_address=franka_ip, enforce_version=False)
     robot.set_home_pose(torch.Tensor(home_pos))
+    print(f"Current joint state: {robot.get_joint_positions()}")    # get current joint state 
     robot.go_home()
 
     # Create and send PD Controller to Franka
