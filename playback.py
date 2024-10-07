@@ -10,6 +10,9 @@ from sensor_msgs.msg import Image
 from geometry_msgs.msg import Pose
 from cv_bridge import CvBridge
 
+import signal
+import sys
+
 class PosedRGBDPublisher(object):
     def __init__(self):
         # Params
@@ -34,6 +37,8 @@ class PosedRGBDPublisher(object):
 
 parser = argparse.ArgumentParser()
 parser.add_argument("file")
+parser.add_argument("--ip", default="172.16.0.2")
+parser.add_argument("--once", action="store_true")
 
 def _separate_filename(filename):
     split = filename[:-4].split("_")
@@ -62,16 +67,25 @@ if __name__ == "__main__":
     gain_type = "default"
     camera = True
     data = np.load(args.file)
-    home, traj, hz = data["home"], data["traj"], data["hz"]
-    env = FrankaEnv(home=home, hz=hz, gain_type=gain_type, camera=camera)
+    ip = str(args.ip)
+    # home, traj, hz = data["home"], data["traj"], data["hz"]
+    traj, hz = data["traj"], data["hz"]
+    env = FrankaEnv(home=None, hz=hz, gain_type=gain_type, camera=camera, ip=ip)
     print(f"Traj: {args.file}, Gain type: {gain_type}, Camera: {camera}")
+
+    run = True
+    def signal_handler(sig, frame):
+        global run
+        run = False
+
+    signal.signal(signal.SIGINT, signal_handler)
 
     user_in = "r"
     while user_in == "r":
         user_in = input(f"Ready. Loaded {args.file} ({hz} hz):")
-    
+
     # Infinite loop trajectory: Cntrl + C to break 
-    while True:
+    while run:
         print("Reset!")
         obs = [env.reset()]
         actions = []
@@ -89,6 +103,12 @@ if __name__ == "__main__":
             rgbd_node.pose = p
             rgbd_node.publish()
             # print(data)
+
+            if not run:
+                break
+        
+        if args.once:
+            break
     env.close()
 
     out_dict = _format_out_dict(obs, np.array(actions), hz, home)

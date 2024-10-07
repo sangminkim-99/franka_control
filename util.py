@@ -76,9 +76,9 @@ class Rate:
 def robot_setup(home_pos, gain_type, franka_ip="172.16.0.1"):
     # Initialize robot interface and reset
     robot = RobotInterface(ip_address=franka_ip, enforce_version=False)
-    robot.set_home_pose(torch.Tensor(home_pos))
+    # robot.set_home_pose(torch.Tensor(home_pos)) # not use homepose
     print(f"Current joint state: {robot.get_joint_positions()}")    # get current joint state 
-    robot.go_home()
+    # robot.go_home()
 
     # Create and send PD Controller to Franka
     q_initial = robot.get_joint_positions()

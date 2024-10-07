@@ -13,6 +13,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("name")
 parser.add_argument("--time", type=int, default=20)
 parser.add_argument("--task", type=str, default="pour")
+parser.add_argument("--ip", type=str, default="172.16.0.2")
 
 
 def _get_filename(dir, input, task):
@@ -29,9 +30,9 @@ if __name__ == "__main__":
     name = args.name
     task = str(args.task)
     expt_time = int(args.time)
+    ip = str(args.ip)
 
-    home = HOMES[task]
-    env = FrankaEnv(home=home, hz=HZ, gain_type="record", camera=False)
+    env = FrankaEnv(home=None, hz=HZ, gain_type="record", camera=False, ip=ip)
     
     filename = _get_filename("data", name, task)
 
@@ -50,4 +51,4 @@ if __name__ == "__main__":
         os.mkdir("data")
     
     print(f"Saving data into folder {filename}")
-    np.savez(filename, home=home, hz=HZ, traj=joints)
+    np.savez(filename, home=None, hz=HZ, traj=joints)

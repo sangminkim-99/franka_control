@@ -6,7 +6,7 @@ from camera import Camera
 from collections import OrderedDict
 
 class FrankaEnv(Env):
-    def __init__(self, home, hz, gain_type, camera=True):
+    def __init__(self, home, hz, gain_type, camera=True, ip='172.16.0.2'):
         self.observation_space = spaces.Box(
             low=LOW_JOINTS, high=HIGH_JOINTS, dtype=np.float32
         )
@@ -19,6 +19,7 @@ class FrankaEnv(Env):
         self.rate = Rate(hz)
         self.gain_type = gain_type
         self.camera = Camera() if camera else None
+        self.ip = ip
         self.reset()
 
     def step(self, ac):
@@ -39,7 +40,7 @@ class FrankaEnv(Env):
         return obs
 
     def reset(self):
-        self.robot, self.policy = robot_setup(self.home, self.gain_type)
+        self.robot, self.policy = robot_setup(self.home, self.gain_type, self.ip)
         return self._get_obs()
 
     def close(self):
